@@ -184,13 +184,6 @@ private:
 public:
     PrivateChat(string u1, string u2) {
         // TODO: Implement constructor
-        user1=u1;
-        user2=u2;
-
-        participants.push_back(u1);
-        participants.push_back(u1);
-
-        chatName="Chat between "+u1+" and "+u2;
     }
 
     void displayChat() const override {
@@ -213,12 +206,6 @@ private:
 public:
     GroupChat(vector<string> users, string name, string creator) {
         // TODO: Implement constructor
-
-        chatName=name;
-        participants=users;
-        participants.push_back(creator);
-        admins.push_back(creator);
-
     }
 
     void addAdmin(string newAdmin) {
@@ -237,11 +224,6 @@ public:
 
     bool isParticipant(string username) const {
         // TODO: Implement participant check
-        for(string user : participants){
-            if(user==username){
-                return true;
-            }
-        }
         return false;
     }
 
@@ -292,63 +274,13 @@ public:
     void login() {
         // TODO: Implement user login
     }
-    //
+
     void startPrivateChat() {
         // TODO: Implement private chat creation
-        if(!isLoggedIn()) {
-            cout<< "You must login first."<<endl;
-            return;
-        }
-        string username;
-        cout<<"Enter username to chat with: ";
-        cin>>username;
-
-        int index = findUserIndex(username);
-        if(index == -1){
-            cout<<"User not found."<<endl;
-            return;
-        }
-        string currentUser = getCurrentUsername();
-        if(username == currentUser){
-            cout<<"You cannot chat with yourself."<<endl;
-            return;
-        }
-        Chat* newChat = new PrivateChat(currentUser , username);
-        chats.push_back(newChat);
-
-        cout<<"Private chat created with "<<username<<endl;
     }
 
     void createGroup() {
         // TODO: Implement group creation
-        if(!isLoggedIn()){
-            cout<<"You must login first."<<endl;
-            return;
-        }
-        string groupName;
-        cout<<"Enter group name: ";
-        cin>>groupName;
-
-        int numOfpart;
-        cout<<"Enter the number of participants: ";
-        cin>>numOfpart;
-        vector<string>users;
-        for(int i=0;i<numOfpart;i++) {
-            string username;
-            cout<<"Enter username "<<i+1<<": ";
-            cin>>username;
-
-            if(findUserIndex(username)==-1){
-                cout<<"User not founs."<<endl;
-                i--;
-                continue;
-            }
-            users.push_back(username);
-        }
-        string creator = getCurrentUsername(); //the one that logged in
-        Chat* group = new GroupChat(users , groupName , creator);
-        chats.push_back(group);
-        cout << "Group created successfully!"<<endl;
     }
 
     void viewChats() const {
