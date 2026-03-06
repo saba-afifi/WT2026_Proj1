@@ -257,9 +257,12 @@ private:
     string user2;
 
 public:
-    PrivateChat(string u1, string u2) : Chat({u1, u2}, u1 + " & " + u2) {
+    PrivateChat(string u1, string u2) {
         user1 = u1;
         user2 = u2;
+        participants.push_back(u1);
+        participants.push_back(u2);  // Fixed: was pushing u1 twice
+        chatName = "Chat between " + u1 + " and " + u2;
     }
 
     void displayChat() const override {
@@ -286,7 +289,10 @@ private:
     string description;
 
 public:
-    GroupChat(vector<string> users, string name, string creator) : Chat(users, name) {
+    GroupChat(vector<string> users, string name, string creator) {
+        chatName = name;
+        participants = users;
+        participants.push_back(creator);  // Add creator to participants
         admins.push_back(creator);
         description = "Group description not set";
     }
@@ -321,7 +327,12 @@ public:
     }
 
     bool isParticipant(string username) const {
-        return find(participants.begin(), participants.end(), username) != participants.end();
+        for (string user : participants) {
+            if (user == username) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void setDescription(string desc) {
@@ -443,25 +454,36 @@ public:
     }
 
     void startPrivateChat() {
-        if (!isLoggedIn()) return;
-
-        string otherUser;
-        cout << "Enter username to chat with: ";
-        cin.ignore();
-        getline(cin, otherUser);
-
-        if (findUserIndex(otherUser) == -1) {
-            cout << "User not found.\n";
+        if (!isLoggedIn()) {
+            cout << "You must login first." << endl;
             return;
         }
 
-        PrivateChat* newChat = new PrivateChat(getCurrentUsername(), otherUser);
+        string username;
+        cout << "Enter username to chat with: ";
+        cin >> username;
+
+        int index = findUserIndex(username);
+        if (index == -1) {
+            cout << "User not found." << endl;
+            return;
+        }
+
+        string currentUser = getCurrentUsername();
+        if (username == currentUser) {
+            cout << "You cannot chat with yourself." << endl;
+            return;
+        }
+
+        Chat* newChat = new PrivateChat(currentUser, username);
         chats.push_back(newChat);
-        cout << "Private chat started with " << otherUser << endl;
+
+        cout << "Private chat created with " << username << endl;
 
         // Simple message sending demo
         string message;
         cout << "Enter your first message (or 'quit' to skip): ";
+        cin.ignore();
         getline(cin, message);
         if (message != "quit") {
             Message msg(getCurrentUsername(), message);
@@ -472,32 +494,51 @@ public:
     }
 
     void createGroup() {
-        if (!isLoggedIn()) return;
+        if (!isLoggedIn()) {
+            cout << "You must login first." << endl;
+            return;
+        }
 
         string groupName;
         cout << "Enter group name: ";
-        cin.ignore();
-        getline(cin, groupName);
+        cin >> groupName;
+
+        int numOfPart;
+        cout << "Enter the number of participants: ";
+        cin >> numOfPart;
 
         vector<string> members;
-        members.push_back(getCurrentUsername());
+        for (int i = 0; i < numOfPart; i++) {
+            string username;
+            cout << "Enter username " << i + 1 << ": ";
+            cin >> username;
 
-        string member;
-        cout << "Add members (enter 'done' to finish):\n";
-        while (true) {
-            cout << "Add member: ";
-            getline(cin, member);
-            if (member == "done") break;
-            if (findUserIndex(member) != -1) {
-                members.push_back(member);
-            } else {
-                cout << "User " << member << " not found.\n";
+            if (findUserIndex(username) == -1) {
+                cout << "User not found." << endl;
+                i--;
+                continue;
             }
+
+            // Check if user is already added
+            if (find(members.begin(), members.end(), username) != members.end()) {
+                cout << "User already added to group." << endl;
+                i--;
+                continue;
+            }
+
+            members.push_back(username);
         }
 
-        GroupChat* newGroup = new GroupChat(members, groupName, getCurrentUsername());
-        chats.push_back(newGroup);
-        cout << "Group '" << groupName << "' created successfully!\n";
+        string creator = getCurrentUsername(); //the one that logged in
+
+        // Check if creator is already in members list
+        if (find(members.begin(), members.end(), creator) == members.end()) {
+            members.push_back(creator);
+        }
+
+        Chat* group = new GroupChat(members, groupName, creator);
+        chats.push_back(group);
+        cout << "Group created successfully!" << endl;
     }
 
     void viewChats() const {
