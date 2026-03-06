@@ -4,391 +4,413 @@
 #include <ctime>
 using namespace std;
 
+
+=======
+// USER CLASS
 // ========================
-//       USER CLASS
-// ========================
+// TEAM MEMBER 1: Implement all methods in this class
 class User {
 private:
-    string username;
-    string password;
-    string phoneNumber;
-    string status;
-    string lastSeen;
+ string username;
+ string password;
+ string phoneNumber;
+ string status;
+ string lastSeen;
 
 public:
-    User() {
-        // TODO: Implement default constructor
-    }
+ User() {
+  username = "";
+  password = "";
+  phoneNumber = "";
+  status = "Online";
+  lastSeen = "Never";
+ }
 
-    User(string uname, string pwd, string phone) {
-        // TODO: Implement parameterized constructor
-    }
+ User(string uname, string pwd, string phone) {
+  username = uname;
+  password = pwd;
+  phoneNumber = phone;
+  status = "Online";
+  updateLastSeen();
+ }
 
-    string getUsername() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getUsername() const {
+  return username;
+ }
 
-    string getPhoneNumber() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getPhoneNumber() const {
+  return phoneNumber;
+ }
 
-    string getStatus() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getStatus() const {
+  return status;
+ }
 
-    string getLastSeen() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getLastSeen() const {
+  return lastSeen;
+ }
 
-    void setStatus(string newStatus) {
-        // TODO: Implement setter
-    }
+ void setStatus(string newStatus) {
+  status = newStatus;
+ }
 
-    void setPhoneNumber(string phone) {
-        // TODO: Implement setter
-    }
+ void setPhoneNumber(string phone) {
+  phoneNumber = phone;
+ }
 
-    void updateLastSeen() {
-        // TODO: Implement last seen update
-    }
+ void updateLastSeen() {
+  time_t now = time(0);
+  char* dt = ctime(&now);
+  lastSeen = string(dt);
+ }
 
-    bool checkPassword(string pwd) const {
-        // TODO: Implement password check
-        return false;
-    }
+ bool checkPassword(string pwd) const {
+  return pwd == password;
+ }
 
-    void changePassword(string newPwd) {
-        // TODO: Implement password change
-    }
+ void changePassword(string newPwd) {
+  password = newPwd;
+ }
 };
 
 // ========================
-//      MESSAGE CLASS
+// MESSAGE CLASS
 // ========================
+// TEAM MEMBER 2: Implement all methods in this class
 class Message {
 private:
-    string sender;
-    string content;
-    string timestamp;
-    string status;
-    Message* replyTo;
+ string sender;
+ string content;
+ string timestamp;
+ string status;
+ Message* replyTo;
 
 public:
-    Message() {
-        // TODO: Implement default constructor
-    }
+ Message() {
+ // TODO: Implement default constructor
+ }
 
-    Message(string sndr, string cntnt) {
-        // TODO: Implement parameterized constructor
-    }
+ Message(string sndr, string cntnt) {
+ // TODO: Implement parameterized constructor
+ }
 
-    string getContent() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getContent() const {
+ // TODO: Implement getter
+ return "";
+ }
 
-    string getSender() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getSender() const {
+ // TODO: Implement getter
+ return "";
+ }
 
-    string getTimestamp() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getTimestamp() const {
+ // TODO: Implement getter
+ return "";
+ }
 
-    string getStatus() const {
-        // TODO: Implement getter
-        return "";
-    }
+ string getStatus() const {
+ // TODO: Implement getter
+ return "";
+ }
 
-    Message* getReplyTo() const {
-        // TODO: Implement getter
-        return nullptr;
-    }
+ Message* getReplyTo() const {
+ // TODO: Implement getter
+ return nullptr;
+ }
 
-    void setStatus(string newStatus) {
-        // TODO: Implement setter
-    }
+ void setStatus(string newStatus) {
+ // TODO: Implement setter
+ }
 
-    void setReplyTo(Message* msg) {
-        // TODO: Implement setter
-    }
+ void setReplyTo(Message* msg) {
+ // TODO: Implement setter
+ }
 
-    void updateTimestamp() {
-        // TODO: Implement timestamp update
-    }
+ void updateTimestamp() {
+ // TODO: Implement timestamp update
+ }
 
-    void display() const {
-        // TODO: Implement message display
-    }
+ void display() const {
+ // TODO: Implement message display
+ }
 
-    void addEmoji(string emojiCode) {
-        // TODO: Implement emoji support
-    }
+ void addEmoji(string emojiCode) {
+ // TODO: Implement emoji support
+ }
 };
 
 // ========================
-//       CHAT CLASS (BASE)
+// CHAT CLASS (BASE)
 // ========================
+// TEAM MEMBER 3: Implement all methods in this class
 class Chat {
 protected:
-    vector<string> participants;
-    vector<Message> messages;
-    string chatName;
+ vector<string> participants;
+ vector<Message> messages;
+ string chatName;
 
 public:
-    Chat() {
-        // TODO: Implement default constructor
-    }
+ Chat() {
+ // TODO: Implement default constructor
+ }
 
-    Chat(vector<string> users, string name) {
-        // TODO: Implement parameterized constructor
-    }
+ Chat(vector<string> users, string name) {
+ // TODO: Implement parameterized constructor
+ }
 
-    void addMessage(const Message& msg) {
-        // TODO: Implement message addition
-    }
+ void addMessage(const Message& msg) {
+ // TODO: Implement message addition
+ }
 
-    bool deleteMessage(int index, const string& username) {
-        // TODO: Implement message deletion
-        return false;
-    }
+ bool deleteMessage(int index, const string& username) {
+ // TODO: Implement message deletion
+ return false;
+ }
 
-    virtual void displayChat() const {
-        // TODO: Implement chat display
-    }
+ virtual void displayChat() const {
+ // TODO: Implement chat display
+ }
 
-    vector<Message> searchMessages(string keyword) const {
-        // TODO: Implement message search
-        return {};
-    }
+ vector<Message> searchMessages(string keyword) const {
+ // TODO: Implement message search
+ return {};
+ }
 
-    void exportToFile(const string& filename) const {
-        // TODO: Implement export to file
-    }
+ void exportToFile(const string& filename) const {
+ // TODO: Implement export to file
+ }
 };
 
 // ========================
-//     PRIVATE CHAT CLASS
+// PRIVATE CHAT CLASS
 // ========================
+// TEAM MEMBER 3: Implement all methods in this class
 class PrivateChat : public Chat {
 private:
-    string user1;
-    string user2;
+ string user1;
+ string user2;
 
 public:
-    PrivateChat(string u1, string u2) {
-        // TODO: Implement constructor
-        user1=u1;
-        user2=u2;
+ PrivateChat(string u1, string u2) {
+ // TODO: Implement constructor
+ }
 
-        participants.push_back(u1);
-        participants.push_back(u1);
+ void displayChat() const override {
+ // TODO: Implement private chat display
+ }
 
-        chatName="Chat between "+u1+" and "+u2;
-    }
-
-    void displayChat() const override {
-        // TODO: Implement private chat display
-    }
-
-    void showTypingIndicator(const string& username) const {
-        // TODO: Implement typing indicator
-    }
+ void showTypingIndicator(const string& username) const {
+ // TODO: Implement typing indicator
+ }
 };
 
 // ========================
-//      GROUP CHAT CLASS
+// GROUP CHAT CLASS
 // ========================
+// TEAM MEMBER 4: Implement all methods in this class
 class GroupChat : public Chat {
 private:
-    vector<string> admins;
-    string description;
+ vector<string> admins;
+ string description;
 
 public:
-    GroupChat(vector<string> users, string name, string creator) {
-        // TODO: Implement constructor
+ GroupChat(vector<string> users, string name, string creator) {
+ // TODO: Implement constructor
+ }
 
-        chatName=name;
-        participants=users;
-        participants.push_back(creator);
-        admins.push_back(creator);
+ void addAdmin(string newAdmin) {
+ // TODO: Implement add admin
+ }
 
-    }
+ bool removeParticipant(const string& admin, const string& userToRemove) {
+ // TODO: Implement remove participant
+ return false;
+ }
 
-    void addAdmin(string newAdmin) {
-        // TODO: Implement add admin
-    }
+ bool isAdmin(string username) const {
+ // TODO: Implement admin check
+ return false;
+ }
 
-    bool removeParticipant(const string& admin, const string& userToRemove) {
-        // TODO: Implement remove participant
-        return false;
-    }
+ bool isParticipant(string username) const {
+ // TODO: Implement participant check
+ return false;
+ }
 
-    bool isAdmin(string username) const {
-        // TODO: Implement admin check
-        return false;
-    }
+ void setDescription(string desc) {
+ // TODO: Implement set description
+ }
 
-    bool isParticipant(string username) const {
-        // TODO: Implement participant check
-        for(string user : participants){
-            if(user==username){
-                return true;
-            }
-        }
-        return false;
-    }
+ void displayChat() const override {
+ // TODO: Implement group chat display
+ }
 
-    void setDescription(string desc) {
-        // TODO: Implement set description
-    }
-
-    void displayChat() const override {
-        // TODO: Implement group chat display
-    }
-
-    void sendJoinRequest(const string& username) {
-        // TODO: Implement join request
-    }
+ void sendJoinRequest(const string& username) {
+ // TODO: Implement join request
+ }
 };
 
 // ========================
-//    WHATSAPP APP CLASS
+// WHATSAPP APP CLASS
 // ========================
+// TEAM MEMBER 1: Implement findUserIndex, isLoggedIn, getCurrentUsername, signUp, login, logout
+// TEAM MEMBER 4: Implement startPrivateChat, createGroup, viewChats, and manage integration
 class WhatsApp {
 private:
-    vector<User> users;
-    vector<Chat*> chats;
-    int currentUserIndex;
+ vector<User> users;
+ vector<Chat*> chats;
+ int currentUserIndex;
 
-    int findUserIndex(string username) const {
-        // TODO: Implement user search
-        return -1;
-    }
+ int findUserIndex(string username) const {
 
-    bool isLoggedIn() const {
-        // TODO: Implement login check
-        return false;
-    }
+ for (int i = 0; i < users.size(); i++) {
 
-    string getCurrentUsername() const {
-        // TODO: Implement get current user
-        return "";
-    }
+  if (users[i].getUsername() == username) {
+   return i;
+  }
+
+ }
+
+ return -1;
+}
+
+bool isLoggedIn() const {
+
+ return currentUserIndex != -1;
+
+}
+
+ string getCurrentUsername() const {
+
+ if (currentUserIndex == -1)
+  return "";
+
+ return users[currentUserIndex].getUsername();
+
+}
 
 public:
-    WhatsApp() : currentUserIndex(-1) {}
+ WhatsApp() : currentUserIndex(-1) {}
 
-    void signUp() {
-        // TODO: Implement user registration
-    }
+ void signUp() {
 
-    void login() {
-        // TODO: Implement user login
-    }
-    //
-    void startPrivateChat() {
-        // TODO: Implement private chat creation
-        if(!isLoggedIn()) {
-            cout<< "You must login first."<<endl;
-            return;
-        }
-        string username;
-        cout<<"Enter username to chat with: ";
-        cin>>username;
+ string username;
+ string password;
+ string phone;
 
-        int index = findUserIndex(username);
-        if(index == -1){
-            cout<<"User not found."<<endl;
-            return;
-        }
-        string currentUser = getCurrentUsername();
-        if(username == currentUser){
-            cout<<"You cannot chat with yourself."<<endl;
-            return;
-        }
-        Chat* newChat = new PrivateChat(currentUser , username);
-        chats.push_back(newChat);
+ cout << "\n--- Sign Up ---\n";
 
-        cout<<"Private chat created with "<<username<<endl;
-    }
+ cout << "Enter username: ";
+ cin.ignore();
+ getline(cin, username);
 
-    void createGroup() {
-        // TODO: Implement group creation
-        if(!isLoggedIn()){
-            cout<<"You must login first."<<endl;
-            return;
-        }
-        string groupName;
-        cout<<"Enter group name: ";
-        cin>>groupName;
+ if (findUserIndex(username) != -1) {
+  cout << "Username already exists.\n";
+  return;
+ }
 
-        int numOfpart;
-        cout<<"Enter the number of participants: ";
-        cin>>numOfpart;
-        vector<string>users;
-        for(int i=0;i<numOfpart;i++) {
-            string username;
-            cout<<"Enter username "<<i+1<<": ";
-            cin>>username;
+ cout << "Enter password: ";
+ getline(cin, password);
 
-            if(findUserIndex(username)==-1){
-                cout<<"User not founs."<<endl;
-                i--;
-                continue;
-            }
-            users.push_back(username);
-        }
-        string creator = getCurrentUsername(); //the one that logged in
-        Chat* group = new GroupChat(users , groupName , creator);
-        chats.push_back(group);
-        cout << "Group created successfully!"<<endl;
-    }
+ cout << "Enter phone number: ";
+ getline(cin, phone);
 
-    void viewChats() const {
-        // TODO: Implement chat viewing
-    }
+ User newUser(username, password, phone);
+ users.push_back(newUser);
 
-    void logout() {
-        // TODO: Implement logout
-    }
+ cout << "Signup successful.\n";
+}
 
-    void run() {
-        while (true) {
-            if (!isLoggedIn()) {
-                cout << "\n1. Login\n2. Sign Up\n3. Exit\nChoice: ";
-                int choice;
-                cin >> choice;
+void login() {
 
-                if (choice == 1) login();
-                else if (choice == 2) signUp();
-                else if (choice == 3) break;
-            }
-            else {
-                cout << "\n1. Start Private Chat\n2. Create Group\n3. View Chats\n4. Logout\nChoice: ";
-                int choice;
-                cin >> choice;
+ string username;
+ string password;
 
-                if (choice == 1) startPrivateChat();
-                else if (choice == 2) createGroup();
-                else if (choice == 3) viewChats();
-                else if (choice == 4) logout();
-            }
-        }
-    }
+ cout << "\n--- Login ---\n";
+
+ cout << "Enter username: ";
+ cin.ignore();
+ getline(cin, username);
+
+ int index = findUserIndex(username);
+
+ if (index == -1) {
+  cout << "User not found.\n";
+  return;
+ }
+
+ cout << "Enter password: ";
+ getline(cin, password);
+
+ if (!users[index].checkPassword(password)) {
+  cout << "Incorrect password.\n";
+  return;
+ }
+
+ currentUserIndex = index;
+
+ cout << "Login successful. Welcome "
+      << users[index].getUsername() << endl;
+}
+ void startPrivateChat() {
+ // TODO: Team Member 4: Implement private chat creation
+ }
+
+ void createGroup() {
+ // TODO: Team Member 4: Implement group creation
+ }
+
+ void viewChats() const {
+ // TODO: Team Member 4: Implement chat viewing
+ }
+
+void logout() {
+
+ if (!isLoggedIn()) {
+  cout << "No user is currently logged in.\n";
+  return;
+ }
+
+ users[currentUserIndex].updateLastSeen();
+
+ cout << "User " << users[currentUserIndex].getUsername() << " logged out.\n";
+
+ currentUserIndex = -1;
+}
+
+ void run() {
+ while (true) {
+ if (!isLoggedIn()) {
+ cout << "\n1. Login\n2. Sign Up\n3. Exit\nChoice: ";
+ int choice;
+ cin >> choice;
+
+ if (choice == 1) login();
+ else if (choice == 2) signUp();
+ else if (choice == 3) break;
+ }
+ else {
+ cout << "\n1. Start Private Chat\n2. Create Group\n3. View Chats\n4. Logout\nChoice: ";
+ int choice;
+ cin >> choice;
+
+ if (choice == 1) startPrivateChat();
+ else if (choice == 2) createGroup();
+ else if (choice == 3) viewChats();
+ else if (choice == 4) logout();
+ }
+ }
+ }
 };
 
 // ========================
-//          MAIN
+// MAIN
 // ========================
+// TEAM MEMBER 4: Ensure main function works with integrated code
 int main() {
-    WhatsApp whatsapp;
-    whatsapp.run();
-    return 0;
+ WhatsApp whatsapp;
+ whatsapp.run();
+ return 0;
 }
+>>>>>>> origin/teammate_2

@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1772749834 source:d:\c++ practice2\project_course\main.cpp
+	<iostream>
+	<vector>
+	<string>
+	<ctime>
+
