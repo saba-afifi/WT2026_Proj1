@@ -13,7 +13,7 @@ using namespace std;
 class Message;
 
 // ========================
-//       USER CLASS
+// USER CLASS
 // ========================
 class User {
 private:
@@ -100,7 +100,7 @@ public:
 };
 
 // ========================
-//      MESSAGE CLASS
+// MESSAGE CLASS
 // ========================
 class Message {
 private:
@@ -210,7 +210,7 @@ public:
 };
 
 // ========================
-//       CHAT CLASS (BASE)
+// CHAT CLASS (BASE)
 // ========================
 class Chat {
 protected:
@@ -277,7 +277,7 @@ public:
 };
 
 // ========================
-//     PRIVATE CHAT CLASS
+// PRIVATE CHAT CLASS
 // ========================
 class PrivateChat : public Chat {
 private:
@@ -310,7 +310,7 @@ public:
 };
 
 // ========================
-//      GROUP CHAT CLASS
+// GROUP CHAT CLASS
 // ========================
 class GroupChat : public Chat {
 private:
@@ -407,7 +407,7 @@ public:
 };
 
 // ========================
-//    WHATSAPP APP CLASS
+// WHATSAPP APP CLASS
 // ========================
 class WhatsApp {
 private:
@@ -807,11 +807,10 @@ public:
 };
 
 // ========================
-//          MAIN
+// MAIN
 // ========================
 int main() {
     WhatsApp whatsapp;
-
     whatsapp.run();
     return 0;
 }
