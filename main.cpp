@@ -4,16 +4,10 @@
 #include <ctime>
 #include <algorithm>
 #include <sstream>
-#include <iomanip>
-#include <limits>
-#include <cctype>
 using namespace std;
 
-// Forward declarations
-class Message;
-
 // ========================
-// USER CLASS
+//       USER CLASS
 // ========================
 class User {
 private:
@@ -23,26 +17,19 @@ private:
     string status;
     string lastSeen;
 
-    string getCurrentTimestamp() const {
-        time_t now = time(0);
-        char* dt = ctime(&now);
-        string ts(dt);
-        ts.pop_back(); // Remove newline
-        return ts;
-    }
-
 public:
-    User() : username(""), password(""), phoneNumber(""), status("Offline") {
+    User() {
+        username = "";
+        password = "";
+        phoneNumber = "";
+        status = "Offline";
         updateLastSeen();
     }
 
-    User(string uname, string pwd, string phone) : username(uname), phoneNumber(phone) {
-        if (pwd.length() >= 6) {
-            password = pwd;
-        } else {
-            password = "";
-            cout << "Password must be at least 6 characters long!" << endl;
-        }
+    User(string uname, string pwd, string phone) {
+        username = uname;
+        password = pwd;
+        phoneNumber = phone;
         status = "Online";
         updateLastSeen();
     }
@@ -74,7 +61,9 @@ public:
     }
 
     void updateLastSeen() {
-        lastSeen = getCurrentTimestamp();
+        time_t now = time(0);
+        lastSeen = ctime(&now);
+        lastSeen.pop_back(); // Remove newline
     }
 
     bool checkPassword(string pwd) const {
@@ -85,22 +74,12 @@ public:
         if (newPwd.length() >= 6) {
             password = newPwd;
             updateLastSeen();
-            cout << "Password changed successfully!" << endl;
-        } else {
-            cout << "Password must be at least 6 characters long!" << endl;
         }
-    }
-
-    void display() const {
-        cout << "Username: " << username << endl;
-        cout << "Phone: " << phoneNumber << endl;
-        cout << "Status: " << status << endl;
-        cout << "Last Seen: " << lastSeen << endl;
     }
 };
 
 // ========================
-// MESSAGE CLASS
+//      MESSAGE CLASS
 // ========================
 class Message {
 private:
@@ -110,50 +89,20 @@ private:
     string status;
     Message* replyTo;
 
-    string getCurrentTimestamp() const {
-        time_t now = time(0);
-        char* dt = ctime(&now);
-        string ts(dt);
-        ts.pop_back(); // Remove newline
-        return ts;
-    }
-
-    string replaceEmoji(string text) const {
-        // Emoji mapping based on SRS
-        size_t pos = 0;
-        while ((pos = text.find(":)", pos)) != string::npos) {
-            text.replace(pos, 2, "😊");
-            pos += 2;
-        }
-        pos = 0;
-        while ((pos = text.find(":(", pos)) != string::npos) {
-            text.replace(pos, 2, "😢");
-            pos += 2;
-        }
-        pos = 0;
-        while ((pos = text.find(":D", pos)) != string::npos) {
-            text.replace(pos, 2, "😃");
-            pos += 2;
-        }
-        pos = 0;
-        while ((pos = text.find(";)", pos)) != string::npos) {
-            text.replace(pos, 2, "😉");
-            pos += 2;
-        }
-        pos = 0;
-        while ((pos = text.find("<3", pos)) != string::npos) {
-            text.replace(pos, 2, "❤️");
-            pos += 2;
-        }
-        return text;
-    }
-
 public:
-    Message() : sender(""), content(""), status("sent"), replyTo(nullptr) {
+    Message() {
+        sender = "";
+        content = "";
+        status = "sent";
+        replyTo = nullptr;
         updateTimestamp();
     }
 
-    Message(string sndr, string cntnt) : sender(sndr), content(cntnt), status("sent"), replyTo(nullptr) {
+    Message(string sndr, string cntnt) {
+        sender = sndr;
+        content = cntnt;
+        status = "sent";
+        replyTo = nullptr;
         updateTimestamp();
     }
 
@@ -186,31 +135,43 @@ public:
     }
 
     void updateTimestamp() {
-        timestamp = getCurrentTimestamp();
+        time_t now = time(0);
+        timestamp = ctime(&now);
+        timestamp.pop_back(); // Remove newline
     }
 
     void display() const {
         cout << "[" << timestamp << "] " << sender << ": ";
-        cout << replaceEmoji(content);
-        if (replyTo != nullptr) {
-            cout << " (Replying to: " << replyTo->getSender() << ": "
-                 << replyTo->getContent().substr(0, 20) << "...)";
+
+        if (replyTo) {
+            cout << "[Replying to: " << replyTo->getSender() << ": "
+                 << replyTo->getContent().substr(0, 20) << "...] ";
         }
-        cout << " [" << status << "]" << endl;
+
+        cout << content << " (" << status << ")" << endl;
     }
 
     void addEmoji(string emojiCode) {
-        content += " " + emojiCode;
-        content = replaceEmoji(content);
-    }
-
-    bool containsKeyword(const string& keyword) const {
-        return content.find(keyword) != string::npos;
+        if (emojiCode==":)") {
+            content+="😊";
+        }
+        else if (emojiCode==":(") {
+            content+="😞";
+        }
+        else if (emojiCode==":D") {
+            content+="😂";
+        }
+        else if (emojiCode=="<3") {
+            content+="❤️";
+        }
+        else if (emojiCode==":thumpsup:") {
+            content+="👍";
+        }
     }
 };
 
 // ========================
-// CHAT CLASS (BASE)
+//       CHAT CLASS (BASE)
 // ========================
 class Chat {
 protected:
@@ -219,20 +180,17 @@ protected:
     string chatName;
 
 public:
-    Chat() : chatName("") {}
+    Chat() {
+        chatName = "";
+    }
 
-    Chat(vector<string> users, string name) : participants(users), chatName(name) {}
-
-    virtual ~Chat() {}
+    Chat(vector<string> users, string name) {
+        participants = users;
+        chatName = name;
+    }
 
     void addMessage(const Message& msg) {
         messages.push_back(msg);
-        // Update status of previous messages to delivered
-        for (auto& m : messages) {
-            if (m.getStatus() == "sent") {
-                const_cast<Message&>(m).setStatus("delivered");
-            }
-        }
     }
 
     bool deleteMessage(int index, const string& username) {
@@ -246,12 +204,13 @@ public:
     }
 
     virtual void displayChat() const {
-        cout << "\n=== " << chatName << " ===" << endl;
+        cout << "=== " << chatName << " ===" << endl;
         cout << "Participants: ";
         for (const auto& p : participants) {
             cout << p << " ";
         }
-        cout << "\n\nMessages:" << endl;
+        cout << "\n" << endl;
+
         for (const auto& msg : messages) {
             msg.display();
         }
@@ -260,7 +219,7 @@ public:
     vector<Message> searchMessages(string keyword) const {
         vector<Message> results;
         for (const auto& msg : messages) {
-            if (msg.containsKeyword(keyword)) {
+            if (msg.getContent().find(keyword) != string::npos) {
                 results.push_back(msg);
             }
         }
@@ -271,89 +230,79 @@ public:
         return chatName;
     }
 
-    bool isParticipant(const string& username) const {
-        return find(participants.begin(), participants.end(), username) != participants.end();
+    vector<string> getParticipants() const {
+        return participants;
     }
 };
 
 // ========================
-// PRIVATE CHAT CLASS
+//     PRIVATE CHAT CLASS
 // ========================
 class PrivateChat : public Chat {
 private:
     string user1;
     string user2;
-    bool typingStatus;
 
 public:
-    PrivateChat(string u1, string u2) : user1(u1), user2(u2), typingStatus(false) {
-        participants = {u1, u2};
-        chatName = "Chat between " + u1 + " and " + u2;
+    PrivateChat(string u1, string u2) : Chat({u1, u2}, "Chat between " + u1 + " and " + u2) {
+        user1 = u1;
+        user2 = u2;
     }
 
     void displayChat() const override {
-        Chat::displayChat();
-        if (typingStatus) {
-            cout << "\n[User is typing...]" << endl;
+        cout << "\n=== Private Chat ===" << endl;
+        cout << user1 << " and " << user2 << endl;
+        cout << "===================" << endl;
+
+        if (messages.empty()) {
+            cout << "No messages yet." << endl;
+        } else {
+            for (const auto& msg : messages) {
+                msg.display();
+            }
         }
     }
 
     void showTypingIndicator(const string& username) const {
-        if (username == user1 || username == user2) {
-            cout << "\n[" << username << " is typing...]" << endl;
-        }
-    }
-
-    void setTyping(bool isTyping) {
-        typingStatus = isTyping;
+        cout << "[" << username << " is typing...]" << endl;
     }
 };
 
 // ========================
-// GROUP CHAT CLASS
+//      GROUP CHAT CLASS
 // ========================
 class GroupChat : public Chat {
 private:
     vector<string> admins;
     string description;
-    vector<string> joinRequests;
 
 public:
     GroupChat(vector<string> users, string name, string creator) : Chat(users, name) {
         admins.push_back(creator);
-        description = "Group created by " + creator;
+        description = "";
     }
 
     void addAdmin(string newAdmin) {
-        if (isParticipant(newAdmin) && !isAdmin(newAdmin)) {
+        if (isParticipant(newAdmin) && find(admins.begin(), admins.end(), newAdmin) == admins.end()) {
             admins.push_back(newAdmin);
             cout << newAdmin << " is now an admin." << endl;
         }
     }
 
     bool removeParticipant(const string& admin, const string& userToRemove) {
-        if (!isAdmin(admin)) {
-            cout << "Only admins can remove participants!" << endl;
-            return false;
-        }
+        if (isAdmin(admin)) {
+            auto it = find(participants.begin(), participants.end(), userToRemove);
+            if (it != participants.end()) {
+                participants.erase(it);
 
-        if (admin == userToRemove) {
-            cout << "Admins cannot remove themselves!" << endl;
-            return false;
-        }
-
-        auto it = find(participants.begin(), participants.end(), userToRemove);
-        if (it != participants.end()) {
-            participants.erase(it);
-
-            // Remove from admins if they were an admin
-            auto adminIt = find(admins.begin(), admins.end(), userToRemove);
-            if (adminIt != admins.end()) {
-                admins.erase(adminIt);
+                // Also remove from admins if they were admin
+                auto adminIt = find(admins.begin(), admins.end(), userToRemove);
+                if (adminIt != admins.end()) {
+                    admins.erase(adminIt);
+                }
+                cout << userToRemove << " removed from group." << endl;
+                return true;
             }
-
-            cout << userToRemove << " removed from group." << endl;
-            return true;
         }
         return false;
     }
@@ -371,43 +320,42 @@ public:
     }
 
     void displayChat() const override {
-        cout << "\n=== " << chatName << " ===" << endl;
-        cout << "Description: " << description << endl;
-        cout << "\nAdmins: ";
-        for (const auto& admin : admins) {
-            cout << admin << " ";
+        cout << "\n=== Group: " << chatName << " ===" << endl;
+        if (!description.empty()) {
+            cout << "Description: " << description << endl;
         }
+
+        cout << "Admins: ";
+        if (admins.empty()) {
+            cout << "None";
+        } else {
+            for (const auto& admin : admins) {
+                cout << admin << " ";
+            }
+        }
+
         cout << "\nParticipants: ";
         for (const auto& p : participants) {
             cout << p << " ";
         }
-        cout << "\n\nMessages:" << endl;
-        for (const auto& msg : messages) {
-            msg.display();
+        cout << "\n" << endl;
+
+        if (messages.empty()) {
+            cout << "No messages yet." << endl;
+        } else {
+            for (const auto& msg : messages) {
+                msg.display();
+            }
         }
     }
 
     void sendJoinRequest(const string& username) {
-        if (!isParticipant(username)) {
-            joinRequests.push_back(username);
-            cout << "Join request sent to group: " << chatName << endl;
-        }
-    }
-
-    void acceptJoinRequest(const string& admin, const string& username) {
-        if (isAdmin(admin)) {
-            auto it = find(joinRequests.begin(), joinRequests.end(), username);
-            if (it != joinRequests.end()) {
-                participants.push_back(username);
-                joinRequests.erase(it);
-                cout << username << " joined the group." << endl;
-            }
-        }
+        cout << username << " requested to join group " << chatName << endl;
     }
 };
 
 // ========================
-// WHATSAPP APP CLASS
+//    WHATSAPP APP CLASS
 // ========================
 class WhatsApp {
 private:
@@ -435,25 +383,12 @@ private:
         return "";
     }
 
-    // FIXED: Proper input clearing function
-    void clearInputBuffer() {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
-
-    // FIXED: Safe string input function
-    string getStringInput(const string& prompt) {
-        cout << prompt;
-        string input;
-        getline(cin, input);
-        return input;
-    }
-
 public:
     WhatsApp() : currentUserIndex(-1) {}
 
     ~WhatsApp() {
-        for (auto chat : chats) {
+        // Clean up dynamically allocated chats
+        for (Chat* chat : chats) {
             delete chat;
         }
     }
@@ -461,20 +396,17 @@ public:
     void signUp() {
         string username, password, phone;
 
-        // FIXED: Clear buffer before string input
-        clearInputBuffer();
-
         cout << "Enter username: ";
-        getline(cin, username);
+        cin >> username;
 
-        // Check uniqueness
+        // Check if username exists
         if (findUserIndex(username) != -1) {
             cout << "Username already exists!" << endl;
             return;
         }
 
         cout << "Enter password (min 6 characters): ";
-        getline(cin, password);
+        cin >> password;
 
         if (password.length() < 6) {
             cout << "Password must be at least 6 characters!" << endl;
@@ -482,20 +414,17 @@ public:
         }
 
         cout << "Enter phone number: ";
-        getline(cin, phone);
+        cin >> phone;
 
         users.push_back(User(username, password, phone));
-        cout << "Registration successful!" << endl;
+        cout << "User created successfully!" << endl;
     }
 
     void login() {
         string username, password;
 
-        // FIXED: Clear buffer before string input
-        clearInputBuffer();
-
         cout << "Enter username: ";
-        getline(cin, username);
+        cin >> username;
 
         int index = findUserIndex(username);
         if (index == -1) {
@@ -504,7 +433,7 @@ public:
         }
 
         cout << "Enter password: ";
-        getline(cin, password);
+        cin >> password;
 
         if (users[index].checkPassword(password)) {
             currentUserIndex = index;
@@ -518,62 +447,106 @@ public:
     void startPrivateChat() {
         if (!isLoggedIn()) return;
 
-        string otherUsername;
-
-        // FIXED: Clear buffer before string input
-        clearInputBuffer();
-
+        string otherUser;
         cout << "Enter username to chat with: ";
-        getline(cin, otherUsername);
+        cin >> otherUser;
 
-        int otherIndex = findUserIndex(otherUsername);
+        int otherIndex = findUserIndex(otherUser);
         if (otherIndex == -1) {
             cout << "User not found!" << endl;
             return;
         }
 
-        if (otherUsername == getCurrentUsername()) {
-            cout << "Cannot chat with yourself!" << endl;
+        if (otherUser == getCurrentUsername()) {
+            cout << "You cannot chat with yourself!" << endl;
             return;
         }
 
         // Check if chat already exists
-        for (auto chat : chats) {
-            PrivateChat* pc = dynamic_cast<PrivateChat*>(chat);
-            if (pc) {
-                if (pc->isParticipant(getCurrentUsername()) && pc->isParticipant(otherUsername)) {
-                    cout << "Chat already exists! Viewing existing chat..." << endl;
-                    pc->displayChat();
+        for (Chat* chat : chats) {
+            PrivateChat* priv = dynamic_cast<PrivateChat*>(chat);
+            if (priv) {
+                vector<string> parts = priv->getParticipants();
+                if ((parts[0] == getCurrentUsername() && parts[1] == otherUser) ||
+                    (parts[0] == otherUser && parts[1] == getCurrentUsername())) {
+                    cout << "Chat already exists!" << endl;
+                    enterChat(priv);
                     return;
                 }
             }
         }
 
         // Create new private chat
-        PrivateChat* newChat = new PrivateChat(getCurrentUsername(), otherUsername);
-        chats.push_back(newChat);
-        cout << "Private chat created with " << otherUsername << endl;
+        PrivateChat* chat = new PrivateChat(getCurrentUsername(), otherUser);
+        chats.push_back(chat);
 
-        // Messaging loop
+        cout << "Private chat started with " << otherUser << endl;
+        enterChat(chat);
+    }
+
+    void enterChat(Chat* chat) {
         string message;
-        cout << "Start typing messages (type '/exit' to stop):" << endl;
+        cout << "\nEntering chat: " << chat->getChatName() << endl;
+        cout << "Commands: type 'exit' to leave, 'emoji' to add emoji, 'typing' to show typing" << endl;
+        cout << "Emoji codes: :) :( :D <3 :thumpsup:" << endl;
 
         while (true) {
-            cout << "You: ";
+            cout << "\nYou: ";
+            cin.ignore();
             getline(cin, message);
 
-            if (message == "/exit") break;
+            if (message == "exit") {
+                break;
+            }
+            else if (message == "typing") {
+                PrivateChat* priv = dynamic_cast<PrivateChat*>(chat);
+                if (priv) {
+                    priv->showTypingIndicator(getCurrentUsername());
+                } else {
+                    cout << "[" << getCurrentUsername() << " is typing...]" << endl;
+                }
+            }
+            else if (message == "emoji") {
+                cout << "Enter emoji code: ";
+                string emojiCode;
+                getline(cin, emojiCode);
 
-            if (!message.empty()) {
-                // Add message
+                Message msg(getCurrentUsername(), "");
+                msg.addEmoji(emojiCode);
+                chat->addMessage(msg);
+                chat->displayChat();
+            }
+            else if (message == "admins" && dynamic_cast<GroupChat*>(chat)) {
+                GroupChat* group = dynamic_cast<GroupChat*>(chat);
+                if (group->isAdmin(getCurrentUsername())) {
+                    cout << "Enter username to make admin: ";
+                    string newAdmin;
+                    getline(cin, newAdmin);
+                    if (findUserIndex(newAdmin) != -1) {
+                        group->addAdmin(newAdmin);
+                    } else {
+                        cout << "User not found!" << endl;
+                    }
+                } else {
+                    cout << "Only admins can add admins!" << endl;
+                }
+            }
+            else if (message == "remove" && dynamic_cast<GroupChat*>(chat)) {
+                GroupChat* group = dynamic_cast<GroupChat*>(chat);
+                if (group->isAdmin(getCurrentUsername())) {
+                    cout << "Enter username to remove: ";
+                    string userToRemove;
+                    getline(cin, userToRemove);
+                    group->removeParticipant(getCurrentUsername(), userToRemove);
+                } else {
+                    cout << "Only admins can remove participants!" << endl;
+                }
+            }
+            else {
+                // Regular message
                 Message msg(getCurrentUsername(), message);
-                newChat->addMessage(msg);
-
-                // Show typing indicator for other user
-                newChat->showTypingIndicator(otherUsername);
-
-                // Display the message
-                cout << "Message sent!" << endl;
+                chat->addMessage(msg);
+                chat->displayChat();
             }
         }
     }
@@ -582,33 +555,27 @@ public:
         if (!isLoggedIn()) return;
 
         string groupName;
-        vector<string> members;
-        string member;
-
-        // FIXED: Clear buffer before string input
-        clearInputBuffer();
-
         cout << "Enter group name: ";
+        cin.ignore();
         getline(cin, groupName);
 
-        cout << "Add members (type 'done' when finished):" << endl;
-        members.push_back(getCurrentUsername()); // Creator is automatically a member
-        cout << "Added: " << getCurrentUsername() << " (creator)" << endl;
+        vector<string> members;
+        members.push_back(getCurrentUsername());
 
+        cout << "Add members (type 'done' to finish):" << endl;
         while (true) {
-            cout << "Enter username (or 'done'): ";
-            getline(cin, member);
+            string member;
+            cout << "Enter username: ";
+            cin >> member;
 
             if (member == "done") break;
-
-            if (member.empty()) continue;
 
             if (findUserIndex(member) != -1) {
                 if (find(members.begin(), members.end(), member) == members.end()) {
                     members.push_back(member);
-                    cout << member << " added to group." << endl;
+                    cout << member << " added to group" << endl;
                 } else {
-                    cout << "User already added!" << endl;
+                    cout << member << " is already in the group!" << endl;
                 }
             } else {
                 cout << "User not found!" << endl;
@@ -620,112 +587,60 @@ public:
             return;
         }
 
-        GroupChat* newGroup = new GroupChat(members, groupName, getCurrentUsername());
-        chats.push_back(newGroup);
+        GroupChat* group = new GroupChat(members, groupName, getCurrentUsername());
+        chats.push_back(group);
+
         cout << "Group '" << groupName << "' created successfully!" << endl;
 
-        // Add description option
-        char addDesc;
-        cout << "Add description? (y/n): ";
-        cin >> addDesc;
-
-        if (addDesc == 'y' || addDesc == 'Y') {
-            clearInputBuffer(); // FIXED: Clear after cin
-            string desc;
-            cout << "Enter description: ";
-            getline(cin, desc);
-            newGroup->setDescription(desc);
-        } else {
-            clearInputBuffer(); // FIXED: Clear buffer even if not adding description
+        // Ask for description
+        cout << "Enter group description (or press enter to skip): ";
+        cin.ignore();
+        string desc;
+        getline(cin, desc);
+        if (!desc.empty()) {
+            group->setDescription(desc);
         }
+
+        // Enter the group chat
+        enterChat(group);
     }
 
     void viewChats() {
         if (!isLoggedIn()) return;
 
         cout << "\n=== Your Chats ===" << endl;
-        int chatCount = 0;
-        vector<int> userChatIndices;
 
-        for (int i = 0; i < chats.size(); i++) {
-            if (chats[i]->isParticipant(getCurrentUsername())) {
-                cout << i + 1 << ". " << chats[i]->getChatName() << endl;
-                userChatIndices.push_back(i);
-                chatCount++;
+        vector<Chat*> userChats;
+        for (Chat* chat : chats) {
+            PrivateChat* priv = dynamic_cast<PrivateChat*>(chat);
+            GroupChat* group = dynamic_cast<GroupChat*>(chat);
+
+            if (priv) {
+                vector<string> parts = priv->getParticipants();
+                if (parts[0] == getCurrentUsername() || parts[1] == getCurrentUsername()) {
+                    userChats.push_back(chat);
+                }
+            }
+            else if (group && group->isParticipant(getCurrentUsername())) {
+                userChats.push_back(chat);
             }
         }
 
-        if (chatCount == 0) {
-            cout << "No chats available." << endl;
+        if (userChats.empty()) {
+            cout << "You have no chats yet." << endl;
             return;
         }
 
-        cout << "Select chat (0 to cancel): ";
+        for (int i = 0; i < userChats.size(); i++) {
+            cout << i + 1 << ". " << userChats[i]->getChatName() << endl;
+        }
+
+        cout << "Enter chat number to open (0 to cancel): ";
         int choice;
         cin >> choice;
 
-        if (choice > 0 && choice <= chatCount) {
-            int chatIndex = userChatIndices[choice - 1];
-            chats[chatIndex]->displayChat();
-
-            // Menu for selected chat
-            cout << "\n1. Send Message\n2. Search Messages\n3. Delete Message\nChoice: ";
-            int action;
-            cin >> action;
-
-            clearInputBuffer(); // FIXED: Clear after cin
-
-            if (action == 1) {
-                // Send message
-                string message;
-                cout << "Enter message: ";
-                getline(cin, message);
-
-                if (!message.empty()) {
-                    Message msg(getCurrentUsername(), message);
-                    chats[chatIndex]->addMessage(msg);
-                    cout << "Message sent!" << endl;
-
-                    // Show typing indicator for private chats
-                    PrivateChat* pc = dynamic_cast<PrivateChat*>(chats[chatIndex]);
-                    if (pc) {
-                        string otherUser = (pc->isParticipant(getCurrentUsername()) ?
-                                            (pc->getChatName().find(getCurrentUsername()) != string::npos ? "other user" : "other user") : "other user");
-                        pc->showTypingIndicator(otherUser);
-                    }
-                }
-            }
-            else if (action == 2) {
-                // Search messages
-                string keyword;
-                cout << "Enter keyword to search: ";
-                getline(cin, keyword);
-
-                vector<Message> results = chats[chatIndex]->searchMessages(keyword);
-                cout << "\nSearch Results:" << endl;
-                if (results.empty()) {
-                    cout << "No messages found." << endl;
-                } else {
-                    for (const auto& msg : results) {
-                        msg.display();
-                    }
-                }
-            }
-            else if (action == 3) {
-                // Delete message
-                int msgIndex;
-                cout << "Enter message number to delete: ";
-                cin >> msgIndex;
-                clearInputBuffer(); // FIXED: Clear after cin
-
-                if (chats[chatIndex]->deleteMessage(msgIndex - 1, getCurrentUsername())) {
-                    cout << "Message deleted!" << endl;
-                } else {
-                    cout << "Cannot delete message! (Make sure it's your message and index is valid)" << endl;
-                }
-            }
-        } else {
-            clearInputBuffer(); // FIXED: Clear buffer even if choice is 0
+        if (choice > 0 && choice <= userChats.size()) {
+            enterChat(userChats[choice - 1]);
         }
     }
 
@@ -733,81 +648,52 @@ public:
         if (isLoggedIn()) {
             users[currentUserIndex].setStatus("Offline");
             users[currentUserIndex].updateLastSeen();
-            cout << "Goodbye, " << users[currentUserIndex].getUsername() << "!" << endl;
             currentUserIndex = -1;
+            cout << "Logged out successfully!" << endl;
         }
     }
 
     void run() {
-        cout << "=== WhatsApp-like Messaging System ===" << endl;
-        cout << "Based on SRS Requirements" << endl;
-
         while (true) {
-            try {
-                if (!isLoggedIn()) {
-                    cout << "\n=== Main Menu ===" << endl;
-                    cout << "1. Login" << endl;
-                    cout << "2. Sign Up" << endl;
-                    cout << "3. Exit" << endl;
-                    cout << "Choice: ";
+            if (!isLoggedIn()) {
+                cout << "\n=== WhatsApp ===" << endl;
+                cout << "1. Login" << endl;
+                cout << "2. Sign Up" << endl;
+                cout << "3. Exit" << endl;
+                cout << "Choice: ";
 
-                    int choice;
-                    cin >> choice;
+                int choice;
+                cin >> choice;
 
-                    if (choice == 1) {
-                        login();
-                    }
-                    else if (choice == 2) {
-                        signUp();
-                    }
-                    else if (choice == 3) {
-                        cout << "Thank you for using WhatsApp-like Messaging System!" << endl;
-                        break;
-                    }
-                    else {
-                        cout << "Invalid choice! Please enter 1, 2, or 3." << endl;
-                        clearInputBuffer(); // FIXED: Clear invalid input
-                    }
-                }
-                else {
-                    cout << "\n=== Main Menu (Logged in as: " << getCurrentUsername() << ") ===" << endl;
-                    cout << "1. Start Private Chat" << endl;
-                    cout << "2. Create Group" << endl;
-                    cout << "3. View Chats" << endl;
-                    cout << "4. Logout" << endl;
-                    cout << "Choice: ";
-
-                    int choice;
-                    cin >> choice;
-
-                    if (choice == 1) {
-                        startPrivateChat();
-                    }
-                    else if (choice == 2) {
-                        createGroup();
-                    }
-                    else if (choice == 3) {
-                        viewChats();
-                    }
-                    else if (choice == 4) {
-                        logout();
-                    }
-                    else {
-                        cout << "Invalid choice! Please enter 1, 2, 3, or 4." << endl;
-                        clearInputBuffer(); // FIXED: Clear invalid input
-                    }
+                if (choice == 1) login();
+                else if (choice == 2) signUp();
+                else if (choice == 3) {
+                    cout << "Goodbye!" << endl;
+                    break;
                 }
             }
-            catch (const exception& e) {
-                cout << "An error occurred: " << e.what() << endl;
-                clearInputBuffer();
+            else {
+                cout << "\n=== Welcome, " << getCurrentUsername() << " ===" << endl;
+                cout << "1. Start Private Chat" << endl;
+                cout << "2. Create Group" << endl;
+                cout << "3. View Chats" << endl;
+                cout << "4. Logout" << endl;
+                cout << "Choice: ";
+
+                int choice;
+                cin >> choice;
+
+                if (choice == 1) startPrivateChat();
+                else if (choice == 2) createGroup();
+                else if (choice == 3) viewChats();
+                else if (choice == 4) logout();
             }
         }
     }
 };
 
 // ========================
-// MAIN
+//          MAIN
 // ========================
 int main() {
     WhatsApp whatsapp;
